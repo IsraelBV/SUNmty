@@ -175,6 +175,7 @@ namespace Nomina.Procesador
                 return summaryList;
             }
 
+            //string contenido = File.ReadAllText(pathCadenaOriginalXslt);
             XslCompiledTransform transformador = new XslCompiledTransform();
             transformador.Load(pathCadenaOriginalXslt);
 

@@ -50,16 +50,16 @@ namespace RH.BLL
             }
         }
 
-        public CalculoInfonavit GetInfonavitById(int idInfonavit)
+        public CalculoInfonavit GetInfonavitById(int idInfonavit, DateTime? periodoFechaFin = null)
         {
             using (var context = new RHEntities())
             {
                 var infonavit = context.Empleado_Infonavit.FirstOrDefault(x => x.Id == idInfonavit);
-                return calcularInfonavit(infonavit);
+                return calcularInfonavit(infonavit, periodoFechaFin);
             }
         }
 
-        public CalculoInfonavit calcularInfonavit(Empleado_Infonavit infonavit)
+        public CalculoInfonavit calcularInfonavit(Empleado_Infonavit infonavit, DateTime? periodoFechaFin = null)
         {
             //Obtener el contrato relacionado al credito
             Empleado_Contrato itemContrato = new Empleado_Contrato();
@@ -87,7 +87,12 @@ namespace RH.BLL
             calculo.TipoCredito = infonavit.TipoCredito;
 
             if (calculo.FechaInicio < DateTime.Today)
-                calculo.FechaAplicada = DateTime.Today;
+                if (periodoFechaFin == null)
+                {
+                    calculo.FechaAplicada = DateTime.Today;
+                } else { 
+                    calculo.FechaAplicada = periodoFechaFin;
+                }
             else
                 calculo.FechaAplicada = calculo.FechaInicio;
 
