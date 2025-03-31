@@ -133,6 +133,7 @@ namespace Nomina.Procesador.Metodos
 
 
             pagoPensionAlimenticia = ((monto) * (porcentajePension / 100));
+            //pagoPensionAlimenticia = 9590;
 
             NOM_Nomina_Detalle item = new NOM_Nomina_Detalle()
             {
@@ -324,7 +325,7 @@ namespace Nomina.Procesador.Metodos
                 if (diasDeDescuento > 0)
                 {
                     //CALCULO DEL CREDITO -
-                    var calculo = inf.GetInfonavitById(prestamoInfonavit.Id);
+                    var calculo = inf.GetInfonavitById(prestamoInfonavit.Id, periodoPago.Fecha_Fin);
                     totalADescontar = diasDeDescuento * calculo.DescuentoDiario;
                     decimal proporcional15diasporbimestre = (15.0M / calculo.DiasBimestre);// el proporcional que toca de descuento diario por los 15 pesos bimestrales
                     totalADescontar += periodoPago.DiasPeriodo * proporcional15diasporbimestre;
