@@ -10,8 +10,8 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.sat.gob.mx/cfd/3", IsNullable = false)]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.sat.gob.mx/cfd/4", IsNullable = false)]
     public partial class Comprobante
     {
 
@@ -76,11 +76,13 @@ namespace Nomina.Procesador.Modelos.Cfdi33
 
         private string confirmacionField;
 
+        private string exportacionField;
+
         private string schemaLocationFieldSpecified;
 
         public Comprobante()
         {
-            this.versionField = "3.3";
+            this.versionField = "4.0";
         }
 
         /// <comentarios/>
@@ -319,6 +321,14 @@ namespace Nomina.Procesador.Modelos.Cfdi33
         }
 
         /// <comentarios/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Exportacion
+        {
+            get { return this.exportacionField; }
+            set { this.exportacionField = value; }
+        }
+
+        /// <comentarios/>
         [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://www.w3.org/2001/XMLSchema-instance")]
         public string schemaLocation
         {
@@ -332,7 +342,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteCfdiRelacionados
     {
 
@@ -362,7 +372,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteCfdiRelacionadosCfdiRelacionado
     {
 
@@ -418,7 +428,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteEmisor
     {
 
@@ -550,13 +560,17 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteReceptor
     {
 
         private string rfcField;
 
         private string nombreField;
+
+        private string domicilioFiscalReceptorField;
+
+        private c_RegimenFiscal regimenFiscalReceptorField;
 
         private string residenciaFiscalField; //c_pais
 
@@ -580,6 +594,24 @@ namespace Nomina.Procesador.Modelos.Cfdi33
         {
             get { return this.nombreField; }
             set { this.nombreField = value; }
+        }
+
+        /// <comentarios/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string DomicilioFiscalReceptor
+        {
+            //c_Pais
+            get { return this.domicilioFiscalReceptorField; }
+            set { this.domicilioFiscalReceptorField = value; }
+        }
+
+        /// <comentarios/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public c_RegimenFiscal RegimenFiscalReceptor
+        {
+            //c_Pais
+            get { return this.regimenFiscalReceptorField; }
+            set { this.regimenFiscalReceptorField = value; }
         }
 
         /// <comentarios/>
@@ -689,7 +721,13 @@ namespace Nomina.Procesador.Modelos.Cfdi33
         D10,
 
         /// <comentarios/>
-        P01,
+        S01,
+
+        /// <comentarios/>
+        CP01,
+
+        /// <comentarios/>
+        CN01,
     }
 
     /// <comentarios/>
@@ -697,7 +735,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConcepto
     {
 
@@ -730,6 +768,8 @@ namespace Nomina.Procesador.Modelos.Cfdi33
         private decimal descuentoField;
 
         private bool descuentoFieldSpecified;
+
+        private string objetoImpField;
 
         /// <comentarios/>
         public ComprobanteConceptoImpuestos Impuestos
@@ -843,6 +883,14 @@ namespace Nomina.Procesador.Modelos.Cfdi33
         }
 
         /// <comentarios/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string ObjetoImp
+        {
+            get { return this.objetoImpField; }
+            set { this.objetoImpField = value; }
+        }
+
+        /// <comentarios/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool DescuentoSpecified
         {
@@ -856,7 +904,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConceptoImpuestos
     {
 
@@ -886,7 +934,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConceptoImpuestosTraslado
     {
 
@@ -1003,7 +1051,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConceptoImpuestosRetencion
     {
 
@@ -1063,7 +1111,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConceptoInformacionAduanera
     {
 
@@ -1083,7 +1131,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConceptoCuentaPredial
     {
 
@@ -1103,7 +1151,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConceptoComplementoConcepto
     {
 
@@ -1123,7 +1171,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConceptoParte
     {
 
@@ -1234,7 +1282,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteConceptoParteInformacionAduanera
     {
 
@@ -1262,7 +1310,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteImpuestos
     {
 
@@ -1332,7 +1380,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteImpuestosRetencion
     {
 
@@ -1362,7 +1410,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteImpuestosTraslado
     {
 
@@ -1415,7 +1463,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     //[System.SerializableAttribute()]
     //[System.Diagnostics.DebuggerStepThroughAttribute()]
     //[System.ComponentModel.DesignerCategoryAttribute("code")]
-    ////[System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    ////[System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     //public partial class ComprobanteComplemento
     //{
     //    private System.Xml.XmlElement[] anyField;
@@ -1452,7 +1500,7 @@ namespace Nomina.Procesador.Modelos.Cfdi33
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/3")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.sat.gob.mx/cfd/4")]
     public partial class ComprobanteAddenda
     {
 
