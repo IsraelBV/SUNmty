@@ -102,7 +102,7 @@ namespace Nomina.Procesador.Metodos
 
         }
 
-        public static NOM_Nomina_Detalle PrimaVacaciones(NOM_Nomina nomina, decimal vacaciones, decimal smg, bool isImpuestoSobreNomina = false, decimal porcentaje = 0)
+        public static NOM_Nomina_Detalle PrimaVacaciones(NOM_Nomina nomina, decimal vacaciones, decimal uma, bool isImpuestoSobreNomina = false, decimal porcentaje = 0)
         {
 
             if (vacaciones <= 0)
@@ -115,7 +115,7 @@ namespace Nomina.Procesador.Metodos
             decimal PrimaVacacionaGravado = 0;
 
             //Tope SMG * 15
-            _topePrima = smg * 15;
+            _topePrima = uma * 15;
             _primaVacacional = Utils.TruncateDecimales(vacaciones * (decimal).25);
 
 

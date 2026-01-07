@@ -387,6 +387,9 @@ namespace Nomina.Procesador.Metodos
 
             // 7) buscar en la tabla de subsidio en que rango esta el Salario Gravable
             decimal subsidioAlEmpleo = tablaSubsidio.Subsidio;
+            //ATENCION: ELIMINAR EL CALCULO ANTERIOR DE SUBSIDIO CON TABLAS Y SUSTITUIRLO POR EL SIGUIENTE
+            //calculo del subsidio a partir de mayo del 2024
+            subsidioAlEmpleo = baseGravable <= 11492.66M ? 536.21M : 0 ; //en enero 2026 15.59% del uma 2025 y en febrero el 15.02% del uma de 2026
 
             //7.1 proporcional para el periodo de 14 dias 
 

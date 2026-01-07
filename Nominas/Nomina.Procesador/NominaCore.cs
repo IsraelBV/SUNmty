@@ -780,7 +780,7 @@ namespace Nomina.Procesador
                                             itemDetalenomina = CalcularConceptoFiscalAsync(itemNomina, ppago,
                                                 empleadoContrato, conceptoEmpleado.IdConcepto,
                                                 conceptoEmpleado.IsImpuestoSobreNomina, _porcentajeNomina,
-                                                zonaSalarial.SMG, empresa.PrimaRiesgo.Value,
+                                                zonaSalarial.SMG, zonaSalarial.UMA, empresa.PrimaRiesgo.Value,
                                                 inasistenciasEnElPeriodo: inasistenciasDelPeriodo,
                                                 totalVacaciones: vacacionesTotal, diasVacaciones: vacacionesDelPeriodo, diasDescuentoInfonavit: diasDescInfonavit);
 
@@ -1167,8 +1167,58 @@ namespace Nomina.Procesador
 
                 if (idEmpresas != null)
                 {
+                    
+                    //variables factura fiscal
+                    decimal totalCuotasIMSS = 0;
+                    decimal totalInfotavit = 0;
+                    decimal totalFonacot = 0;
+                    decimal totalPension = 0;
+                    decimal totalImpuesto = 0;
+                    decimal relativo = 0;
+                    decimal totalPercep = 0;
+                    decimal totalFiscal = 0;
+                    decimal porcentajeIVA = 0;
 
-                    foreach (var idemp in idEmpresas)
+                    //var idnominas = _nominasDao.ObtenerIdNominaByPeriodo(ppago.IdPeriodoPago, idemp.Key);
+                    var idnominas = listaNomina;
+
+                    //recorremos la lista de nominas obteniendo su id
+                    foreach (var id in idnominas)
+                    {
+                        var cuotas = _nominasDao.ObtenerCuotasIMSS2(listaCuotasImss, id.IdNomina);
+                        if (cuotas != null)
+                            totalCuotasIMSS = totalCuotasIMSS + cuotas.TotalObrero + cuotas.TotalPatron;
+
+                        totalInfotavit += _nominasDao.ObtenerInfonavit2(listaNominaDetalle, id.IdNomina);//nomina detalle
+                        //totalInfotavit = totalInfotavit + infona;
+
+                        //var fonat = _nominasDao.ObtenerFonacot2(listaNominaDetalle, id.IdNomina); //nomina detalle
+                        totalFonacot += _nominasDao.ObtenerFonacot2(listaNominaDetalle, id.IdNomina); //Nomina detalle
+
+                        var pensi = _nominasDao.ObtenerPension2(listaNominaDetalle, id.IdNomina); //nomina detalle
+                        totalPension = totalPension + pensi;
+
+                        totalPercep = totalPercep + id.TotalNomina;
+                        totalImpuesto = totalImpuesto + id.TotalImpuestoSobreNomina;
+                    }
+                    //resultado fiscal de la factura            
+                    relativo = totalCuotasIMSS + totalFonacot + totalImpuesto + totalInfotavit + totalPension;
+                    totalFiscal = relativo + totalPercep;
+                    porcentajeIVA = _nominasDao.PorcentajeIVA();
+
+                    int idEmpresaFis = 0;
+                    idEmpresaFis = Convert.ToInt32(idEmpresas.OrderByDescending(x => x).FirstOrDefault() ?? 0);
+                    if (idEmpresaFis > 0)
+                    {
+                        _nominasDao.CrearFactura(ppago.IdPeriodoPago, idEmpresaFis, totalCuotasIMSS,
+                            totalImpuesto, totalInfotavit,
+                            totalFonacot, totalPension, relativo, totalPercep, totalFiscal, porcentajeIVA);
+                    }
+
+
+                    ///modificacion diciembre 2025, ya que se generaban 2 registros de factura y se solicito que el total de la nomina fuera en una sola
+                    ///en general, el caso se debe a que una empresa tiene 2 registros patronales y mesclados sus empleados por registro patronal en una sola nomina
+                    /*foreach (var idemp in idEmpresas)
                     {
                         //variables factura fiscal
                         decimal totalCuotasIMSS = 0;
@@ -1216,7 +1266,7 @@ namespace Nomina.Procesador
                                 totalImpuesto, totalInfotavit,
                                 totalFonacot, totalPension, relativo, totalPercep, totalFiscal, porcentajeIVA);
                         }
-                    }
+                    }*/
                 }
 
                 if (idEmpresasC != null)
@@ -1306,7 +1356,7 @@ namespace Nomina.Procesador
         /// <param name="primaRiesgo"></param>
         /// <param name="inasistenciasEnElPeriodo"></param>
         /// <returns></returns>
-        private static NOM_Nomina_Detalle CalcularConceptoFiscalAsync(NOM_Nomina itemNomina, NOM_PeriodosPago periodoPago, Empleado_Contrato contrato, int idConcepto, bool isPorcentajeSobreNomina, decimal porcentajeSobreNomina, decimal smg = 0, decimal primaRiesgo = 0, int inasistenciasEnElPeriodo = 0, int diasVacaciones = 0, decimal totalVacaciones = 0, int diasDescuentoInfonavit = -1)
+        private static NOM_Nomina_Detalle CalcularConceptoFiscalAsync(NOM_Nomina itemNomina, NOM_PeriodosPago periodoPago, Empleado_Contrato contrato, int idConcepto, bool isPorcentajeSobreNomina, decimal porcentajeSobreNomina, decimal smg = 0, decimal uma = 0, decimal primaRiesgo = 0, int inasistenciasEnElPeriodo = 0, int diasVacaciones = 0, decimal totalVacaciones = 0, int diasDescuentoInfonavit = -1)
         {
             int diasPeriodo = periodoPago.DiasPeriodo;
             switch (idConcepto)
@@ -1330,7 +1380,7 @@ namespace Nomina.Procesador
                 case 148://Vacaciones
                     return MPercepciones.Vacaciones(itemNomina, diasVacaciones, isPorcentajeSobreNomina, porcentajeSobreNomina);
                 case 16://Prima Vacacional
-                    return MPercepciones.PrimaVacaciones(itemNomina, totalVacaciones, smg, isPorcentajeSobreNomina, porcentajeSobreNomina);
+                    return MPercepciones.PrimaVacaciones(itemNomina, totalVacaciones, uma, isPorcentajeSobreNomina, porcentajeSobreNomina);
                 //case 158://Caja de ahorro
                 //    return MDeducciones.CajaDeAhorro(itemNomina);
                 default:
@@ -1885,7 +1935,55 @@ namespace Nomina.Procesador
                 if (idEmpresas != null)
                 {
 
-                    foreach (var idemp in idEmpresas)
+                   
+                    //variables factura fiscal
+                    decimal totalCuotasIMSS = 0;
+                    decimal totalInfotavit = 0;
+                    decimal totalFonacot = 0;
+                    decimal totalPension = 0;
+                    decimal totalImpuesto = 0;
+                    decimal relativo = 0;
+                    decimal totalPercep = 0;
+                    decimal totalFiscal = 0;
+                    decimal porcentajeIVA = 0;
+
+                    //var idnominas = _nominasDao.ObtenerIdNominaByPeriodo(ppago.IdPeriodoPago, idemp.Key);
+                    var idnominas = listaNomina;
+
+                    //recorremos la lista de nominas obteniendo su id
+                    foreach (var id in idnominas)
+                    {
+                        var cuotas = _nominasDao.ObtenerCuotasIMSS2(listaCuotasImss, id.IdNomina);
+                        if (cuotas != null)
+                            totalCuotasIMSS = totalCuotasIMSS + cuotas.TotalObrero + cuotas.TotalPatron;
+
+                        var infona = _nominasDao.ObtenerInfonavit2(listaNominaDetalle, id.IdNomina);//nomina detalle
+                        totalInfotavit = totalInfotavit + infona;
+
+                        var fonat = _nominasDao.ObtenerFonacot2(listaNominaDetalle, id.IdNomina); //nomina detalle
+                        totalFonacot = _nominasDao.ObtenerFonacot2(listaNominaDetalle, id.IdNomina); //Nomina detalle
+
+                        var pensi = _nominasDao.ObtenerPension2(listaNominaDetalle, id.IdNomina); //nomina detalle
+                        totalPension = totalPension + fonat;
+
+                        totalPercep = totalPercep + id.TotalNomina;
+                        totalImpuesto = totalImpuesto + id.TotalImpuestoSobreNomina;
+                    }
+                    //resultado fiscal de la factura            
+                    relativo = totalCuotasIMSS + totalFonacot + totalImpuesto + totalInfotavit + totalPension;
+                    totalFiscal = relativo + totalPercep;
+                    porcentajeIVA = _nominasDao.PorcentajeIVA();
+
+                    int idEmpresaAsim = 0;
+                    idEmpresaAsim = Convert.ToInt32(idEmpresas.OrderByDescending(x => x).FirstOrDefault());
+
+                    _nominasDao.CrearFactura(ppago.IdPeriodoPago, idEmpresaAsim, totalCuotasIMSS, totalImpuesto, totalInfotavit,
+                        totalFonacot, totalPension, relativo, totalPercep, totalFiscal, porcentajeIVA);
+                
+
+                    ///modificacion diciembre 2025, ya que se generaban 2 registros de factura y se solicito que el total de la nomina fuera en una sola
+                    ///en general, el caso se debe a que una empresa tiene 2 registros patronales y mesclados sus empleados por registro patronal en una sola nomina
+                    /*foreach (var idemp in idEmpresas)
                     {
                         //variables factura fiscal
                         decimal totalCuotasIMSS = 0;
@@ -1927,7 +2025,7 @@ namespace Nomina.Procesador
 
                         _nominasDao.CrearFactura(ppago.IdPeriodoPago, Convert.ToInt32(idemp.Key), totalCuotasIMSS, totalImpuesto, totalInfotavit,
                             totalFonacot, totalPension, relativo, totalPercep, totalFiscal, porcentajeIVA);
-                    }
+                    }*/
                 }
 
 

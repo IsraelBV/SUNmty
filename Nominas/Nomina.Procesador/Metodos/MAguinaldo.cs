@@ -30,7 +30,7 @@ namespace Nomina.Procesador.Metodos
          
             //VARIABLES
             decimal sm = 0;
-            int dias = 30;
+            int dias = 30;//para el tope excento
             decimal sd = 0;
             decimal sdi = 0;
             decimal sdr = 0;
@@ -637,35 +637,65 @@ namespace Nomina.Procesador.Metodos
             var empresaFiscal = listaNominaA.Select(x => x.IdEmpresaFiscal).Distinct().ToArray();
             var empresaComplemento = listaNominaA.Select(x => x.IdEmpresaComplemento).Distinct().ToArray();
 
-            empresaFiscal = empresaFiscal.Distinct().ToArray();
+            ///modificacion diciembre 2025, se obtiene el id de la empresa fiscal ultima registrada 
+            //empresaFiscal = empresaFiscal.Distinct().ToArray();
+
+            int idEmpresaFiscalUltima = empresaFiscal.OrderByDescending(x => x).FirstOrDefault()??0;
+
             empresaComplemento = empresaComplemento.Distinct().ToArray();
 
             var porcentajeIva = _nominasDao.PorcentajeIVA();
+           
+            decimal isn = 0;
+            decimal totalPercepcion = 0;
+            decimal totalFiscal = 0;
+            decimal totalPension = 0;
+            decimal relativo = 0;
 
-            foreach (var itemFiscal in empresaFiscal)
-            {
-                decimal isn = 0;
-                decimal totalPercepcion = 0;
-                decimal totalFiscal = 0;
-                decimal totalPension = 0;
-                decimal relativo = 0;
+            isn = listaNominaA.Sum(x => x.TotalImpuestoSobreNomina);
 
-                isn = listaNominaA.Where(x => x.IdEmpresaFiscal == itemFiscal).Sum(x => x.TotalImpuestoSobreNomina);
+            totalPercepcion = listaNominaA.Sum(x => x.TotalNomina);
 
-                totalPercepcion = listaNominaA.Where(x => x.IdEmpresaFiscal == itemFiscal).Sum(x => x.TotalNomina);
+            var arrayIdNom = listaNominaA.Select(x => x.IdNomina).ToArray();
 
-                var arrayIdNom = listaNominaA.Select(x => x.IdNomina).ToArray();
+            var listaA = (from p in listaAguinaldo where arrayIdNom.Contains(p.IdNomina) select p).ToList();
 
-                var listaA = (from p in listaAguinaldo where arrayIdNom.Contains(p.IdNomina) select p).ToList();
+            totalPension = listaA.Sum(x => x.PensionAlimenticia);
 
-                totalPension = listaA.Sum(x => x.PensionAlimenticia);
+            relativo = isn + totalPension;
 
-                relativo = isn + totalPension;
+            totalFiscal = relativo + totalPercepcion;
+            
+            //AQUI SE CREA LA FACTURA DE AGUINALDO
+            _nominasDao.CrearFactura(idPeriodo, idEmpresaFiscalUltima, 0, isn, 0, 0, totalPension, relativo, totalPercepcion, totalFiscal, porcentajeIva);
+            
 
-                totalFiscal = relativo + totalPercepcion;
+            ///modificacion diciembre 2025, ya que se generaban 2 registros de factura y se solicito que el total de la nomina fuera en una sola
+            ///en general, el caso se debe a que una empresa tiene 2 registros patronales y mesclados sus empleados por registro patronal en una sola nomina
+            //foreach (var itemFiscal in empresaFiscal)
+            //{
+            //    decimal isn = 0;
+            //    decimal totalPercepcion = 0;
+            //    decimal totalFiscal = 0;
+            //    decimal totalPension = 0;
+            //    decimal relativo = 0;
 
-                _nominasDao.CrearFactura(idPeriodo, itemFiscal.Value, 0, isn, 0, 0, totalPension, relativo, totalPercepcion, totalFiscal, porcentajeIva);
-            }
+            //    isn = listaNominaA.Where(x => x.IdEmpresaFiscal == itemFiscal).Sum(x => x.TotalImpuestoSobreNomina);
+
+            //    totalPercepcion = listaNominaA.Where(x => x.IdEmpresaFiscal == itemFiscal).Sum(x => x.TotalNomina);
+
+            //    var arrayIdNom = listaNominaA.Select(x => x.IdNomina).ToArray();
+
+            //    var listaA = (from p in listaAguinaldo where arrayIdNom.Contains(p.IdNomina) select p).ToList();
+
+            //    totalPension = listaA.Sum(x => x.PensionAlimenticia);
+
+            //    relativo = isn + totalPension;
+
+            //    totalFiscal = relativo + totalPercepcion;
+
+            //    _nominasDao.CrearFactura(idPeriodo, itemFiscal.Value, 0, isn, 0, 0, totalPension, relativo, totalPercepcion, totalFiscal, porcentajeIva);
+            //}
 
             foreach (var itemComp in empresaComplemento)
             {
@@ -680,9 +710,9 @@ namespace Nomina.Procesador.Metodos
                 decimal porcentajeServicio = 0;
                 decimal totalServicio = 0;
 
-                decimal isn = 0;
+                decimal isnC = 0;
 
-                isn = listaNominaA.Where(x => x.IdEmpresaComplemento == itemComp).Sum(x => x.TotalImpuestoSobreNomina);
+                isnC = listaNominaA.Where(x => x.IdEmpresaComplemento == itemComp).Sum(x => x.TotalImpuestoSobreNomina);
 
                 totalPercepcionesC = listaNominaA.Where(x => x.IdEmpresaComplemento == itemComp).Sum(x => x.TotalComplemento);
 
@@ -692,7 +722,7 @@ namespace Nomina.Procesador.Metodos
                 porcentajeServicio = porcentajeServicio / 100;
                 totalServicio = totalPercepcionesC * porcentajeServicio;
 
-                relativoC = isn;
+                relativoC = isnC;
                 subTotalC = relativoC + totalPercepcionesC + totalServicio;
 
                 totalIVAC = (porcentajeIva / 100) * subTotalC;

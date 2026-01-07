@@ -995,8 +995,8 @@ namespace Nomina.Procesador.Metodos
 
                 // TOPE EXCENTO DE LA PRIMA VACACIONAL Y AGUINALDO
                 //##############################################################
-                decimal Tope_PrimaVacacional = salarioMinimo * 15;        //tope
-                decimal Tope_Aguinaldo = salarioMinimo * 30;              //tope
+                decimal Tope_PrimaVacacional = salarioUMA * 15;        //tope
+                decimal Tope_Aguinaldo = salarioUMA * 30;              //tope
                 //##############################################################
 
                 decimal sueldoGravado = _SUELDO; //se grava al 100%
