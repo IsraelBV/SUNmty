@@ -137,6 +137,8 @@ namespace Nomina.Reportes
                     }
 
                     string[] nombreEmpresa;
+                    string registroPatronal;
+
                     int i = 7;
                     int j = 0;
 
@@ -153,7 +155,8 @@ namespace Nomina.Reportes
                         }
 
                         nombreEmpresa = emp.Nombre.Split(' ');
-                        var nombreHoja = "Dispersion " + nombreEmpresa[0];
+                        registroPatronal = emp.RP is null ? emp.CP : emp.RP;
+                        var nombreHoja = "Dispersion " + nombreEmpresa[0] + " "+ registroPatronal;
 
                         if (nombreHoja.Length > 30)
                         {

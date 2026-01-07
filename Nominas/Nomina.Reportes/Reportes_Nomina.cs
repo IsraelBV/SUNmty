@@ -566,7 +566,7 @@ namespace Nomina.Reportes
             var arrayEmpresaFiscal = listaContratos.Select(x => x.IdEmpresaFiscal).Distinct().ToArray();//obtiene los id de empresas fiscales en esta nomina que deberia ser solo una
             var numeroEmpresas = arrayEmpresaFiscal.Count();
             int idEmpresaFiscal;
-            if (numeroEmpresas > 1)
+            if (numeroEmpresas > 2)
             {
                 return null;
             } else {
@@ -686,7 +686,7 @@ namespace Nomina.Reportes
             var arrayEmpresaFiscal = listaNominas.Select(x => x.IdEmpresaFiscal).Distinct().ToArray();//obtiene los id de empresas fiscales en esta nomina que deberia ser solo una
             var numeroEmpresas = arrayEmpresaFiscal.Count();//cuenta las empresas
             int idEmpresaFiscal;
-            if (numeroEmpresas > 1)//si es mas de una 
+            if (numeroEmpresas > 2)//si es mas de una 
             {
                 return null;
             }

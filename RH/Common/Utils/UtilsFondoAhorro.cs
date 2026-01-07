@@ -105,13 +105,6 @@ namespace Common.Utils
                     return "INBURSA";
                 case 8:
                     return "BANREGIO";
-<<<<<<< Updated upstream
-=======
-                case 9:
-                    return "INVERLAT";
-                case 10:
-                    return "AFIRME";
->>>>>>> Stashed changes
                 default:
                     return "sin banco";
             }
@@ -129,6 +122,8 @@ namespace Common.Utils
                 case 6://ARRENDADORA DATA MOVIL S.A DE C.V 
                     return 4654;
                 case 8://AUTOS DATAMOVIL SA DE CV
+                    return 4653;
+                case 1023://AUTOS DATAMOVIL NUEVO SA DE CV
                     return 4653;
                 default:
                     return 0;

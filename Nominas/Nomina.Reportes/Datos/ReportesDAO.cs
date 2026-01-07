@@ -53,7 +53,7 @@ namespace Nomina.Reportes.Datos
                              RFC = empresa.RFC,
                              RP = empresa.RegistroPatronal
                          }).ToList();
-            return datos.DistinctBy(x => x.Nombre).ToList();
+            return datos;
 
         }
 
@@ -67,7 +67,7 @@ namespace Nomina.Reportes.Datos
             var datos = (from empresa in _ctx.Empresa.AsEnumerable()
                          join sucursal in _ctx.Sucursal_Empresa.AsEnumerable()
                          on empresa.IdEmpresa equals sucursal.IdEmpresa
-                         where sucursal.IdSucursal == idsucursal && sucursal.IdEsquema == 1 || sucursal.IdEsquema == 2 || sucursal.IdEsquema == 4
+                         where sucursal.IdSucursal == idsucursal && (sucursal.IdEsquema == 1 || sucursal.IdEsquema == 2 || sucursal.IdEsquema == 4)
 
                          select new SucursalesEmpresa
                          {
@@ -83,7 +83,7 @@ namespace Nomina.Reportes.Datos
                              RFC = empresa.RFC,
                              RP = empresa.RegistroPatronal
                          }).ToList();
-            return datos.DistinctBy(x => x.Nombre).ToList();
+            return datos.DistinctBy(x => x.RP).ToList();
         }
 
         public List<SucursalesEmpresa> ListaSucursalesEmpresasConSindicato(int idsucursal)
