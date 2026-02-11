@@ -122,7 +122,8 @@ namespace Nomina.Procesador.Metodos
                 else  //Si Resultado es Subsidio, ISR se guarda en Cero
                 {
                     totalConcepto.SubsidioEntregado = objCalculoSubsidio.ResultadoIsrOSubsidio;
-                    GuardarConcepto(nomina.IdNomina, 144, (objCalculoSubsidio.ResultadoIsrOSubsidio), 0, 0, 0, 0);
+                    //GuardarConcepto(nomina.IdNomina, 144, (objCalculoSubsidio.ResultadoIsrOSubsidio), 0, 0, 0, 0);
+                    GuardarConcepto(nomina.IdNomina, 144, 0, 0, 0, 0, 0);
                     GuardarConcepto(nomina.IdNomina, 43, 0, 0, 0, 0, 0);
                 }
 
@@ -334,24 +335,23 @@ namespace Nomina.Procesador.Metodos
             decimal holdBaseGravable = 0;
             decimal subsidio304 = 0;
             decimal isr304 = 0;
+            decimal salarioMinimoMensual = 0;
 
-            //Regla 14 dias - para nominas catorcenales***********************************************************
-            //version 30.4
-            //Se obtiene el sueldo mensual
+            decimal isrOSubsidio = 0;
+            decimal netoPagar = 0;
 
-            //nuevaBaseGravable = (SD * variableMensual);//Obtenemos el sueldo mensual SD * 30.4
-            //holdBaseGravable = baseGravable; //Guardamos la baseGravable anterior
-            //baseGravable = (decimal)nuevaBaseGravable;
-
+            //10-02-2026
+            //La Regla del Artículo 96 LISR
+            //No se efectuará retención a las personas que únicamente perciban un salario mínimo general correspondiente al área geográfica del contribuyente
+            var dao = new NominasDao();
+            var zonaSalario = dao.GetZonaSalario();
+            salarioMinimoMensual = Utils.TruncateDecimales((zonaSalario.SMG * (decimal)factor304)+0.02M);//se suben 2 desimales para que entre por calculos donde por decimales queda fuera del salario minimo
 
             nuevaBaseGravable = (baseGravable / nomina.Dias_Laborados) * factor304;//nueva base a 30.4
             holdBaseGravable = baseGravable; //Guardamos la baseGravable anterior
             baseGravable = (decimal)nuevaBaseGravable;// establecemos como base de calculo la nueva base encontrada
-            //******************************************************************************************************
-
-
+                                                      //******************************************************************************************************
             tipoTarifa = 5;//mensual
-
 
             List<C_NOM_Tabla_ISR> tablaisrcompleta = null;
             List<C_NOM_Tabla_Subsidio> tablasubsidiocompleta = null;
@@ -367,6 +367,10 @@ namespace Nomina.Procesador.Metodos
                 tablasubsidiocompleta = NominasDao.GetAllTablaSubsidios(tipoTarifa);
             }
 
+            //calculo del subsidio a partir de mayo del 2024
+            decimal subsidioAlEmpleo = baseGravable <= 11492.66M ? 535.65M : 0; //en enero 2026 15.59% del uma 2025 y en febrero el 15.02% del uma de 2026
+            subsidio304 = Utils.TruncateDecimales((subsidioAlEmpleo / (decimal)factor304) * nomina.Dias_Laborados);
+
             //1) Buscar el rango de limite inferior
             decimal limiteInferior = tablaIsr.Limite_Inferior;
 
@@ -376,75 +380,65 @@ namespace Nomina.Procesador.Metodos
             //3) Tomar el porcentaje del Rango %
             decimal porcentaje = tablaIsr.Porcentaje;
 
-            //4) Multiplicar el % por la BASE
-            decimal resultado = _base * (porcentaje / 100);
-
-            //5)Tomar la cuota fija del rango
-            decimal cuotaFija = tablaIsr.Cuota_Fija;
-
-            //6 Sumar 4) + 5) = ISR
-            decimal isr = resultado + cuotaFija;
-
-            // 7) buscar en la tabla de subsidio en que rango esta el Salario Gravable
-            decimal subsidioAlEmpleo = tablaSubsidio.Subsidio;
-            //ATENCION: ELIMINAR EL CALCULO ANTERIOR DE SUBSIDIO CON TABLAS Y SUSTITUIRLO POR EL SIGUIENTE
-            //calculo del subsidio a partir de mayo del 2024
-            subsidioAlEmpleo = baseGravable <= 11492.66M ? 536.21M : 0 ; //en enero 2026 15.59% del uma 2025 y en febrero el 15.02% del uma de 2026
-
-            //7.1 proporcional para el periodo de 14 dias 
-
-            //version 30.4
-            isr304 = Utils.TruncateDecimales((isr / (decimal)factor304) * nomina.Dias_Laborados);
-            subsidio304 = Utils.TruncateDecimales((subsidioAlEmpleo / (decimal)factor304) * nomina.Dias_Laborados);
-            baseGravable = (decimal)holdBaseGravable;
-
-
-
-            //8) Resta del 6) - 7) = ISR o Subsidio
-            decimal isrOSubsidio = 0;
-            if (isr > subsidioAlEmpleo)
+            if (nuevaBaseGravable > salarioMinimoMensual)
             {
-                isrOSubsidio = (isr - subsidioAlEmpleo);
+                //4) Multiplicar el % por la BASE
+                decimal resultado = _base * (porcentaje / 100);
+
+                //5)Tomar la cuota fija del rango
+                decimal cuotaFija = tablaIsr.Cuota_Fija;
+
+                //6 Sumar 4) + 5) = ISR
+                decimal isr = resultado + cuotaFija;
 
                 //version 30.4
-                isrOSubsidio = (isr304 - subsidio304);
-                
+                isr304 = Utils.TruncateDecimales((isr / (decimal)factor304) * nomina.Dias_Laborados);
+
+                baseGravable = (decimal)holdBaseGravable;
+
+                //8) Resta del 6) - 7) = ISR o Subsidio
+                if (isr > subsidioAlEmpleo)
+                {
+                    //version 30.4
+                    isrOSubsidio = (isr304 - subsidio304);
+                }
+                else
+                {
+                    //version 30.4
+                    isrOSubsidio = (subsidio304 - isr304);
+                    isrOSubsidio = 0;//directamente cero ya que no se devuelve subsidio al trabajador
+                }
+
+                //9) Neto a pagar Salario Gravable - 8)
+                esISR = isr > subsidioAlEmpleo;
+
+                if (esISR)
+                {
+                    netoPagar = baseGravable - (isrOSubsidio);
+                }
+                else
+                {
+                    //netoPagar = baseGravable + (isrOSubsidio);
+                    netoPagar = baseGravable; // Simplemente la base, sin sumas.
+                }
+
+                esISR = isr > subsidioAlEmpleo;
             }
-            else
-            {
-                isrOSubsidio = (subsidioAlEmpleo - isr);
-
-                //version 30.4
-                isrOSubsidio = (subsidio304 - isr304);
-                
+            else {
+               
+               esISR = false;// no es subsidio pero como si lo fuera por la regla art 96
+               netoPagar = (decimal)holdBaseGravable;//es la base grabable del periodo sin elevarlo al 30.4
             }
-
-
-            //9) Neto a pagar Salario Gravable - 8)
-            decimal netoPagar = 0;
-            esISR = isr > subsidioAlEmpleo;
-
-            if (esISR)
-            {
-                netoPagar = baseGravable - (isrOSubsidio);
-            }
-            else
-            {
-                netoPagar = baseGravable + (isrOSubsidio);
-            }
-
-            esISR = isr > subsidioAlEmpleo;
 
             var item = new IsrSubsidio()
             {
-
                 BaseGravable = baseGravable,
                 BaseGravableMensual = (decimal)nuevaBaseGravable,
                 LimiteInferior = limiteInferior,
                 Base = _base,
                 Tasa = porcentaje,
                 IsrAntesDeSub = isr304,
-                Subsidio = subsidio304,//subsidioAlEmpleo
+                Subsidio = subsidio304,//subsidioAlEmpleo-subsidiocausado
                 NetoAPagar = Utils.TruncateDecimales(netoPagar),
                 ResultadoIsrOSubsidio = Common.Utils.Utils.TruncateDecimales(isrOSubsidio),
                 IdTablaIsr = tablaIsr.IdISR,

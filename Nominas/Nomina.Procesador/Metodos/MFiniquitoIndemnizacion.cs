@@ -544,6 +544,7 @@ namespace Nomina.Procesador.Metodos
 
                 decimal primaVacacional = (factorIntegracion.PrimaVacacional * 100);//25; //%
                 decimal sd = contratoEmpleado.SD;//127.54; //No el integrado
+                decimal sdi = contratoEmpleado.SDI;//salario diario integrado
 
                 // se almacena en dias, 90 equivale a los 3 meses, pero hay finiquitos que usan un proporcional ejemplo 82 dias y nos los 3 meses completos
 
@@ -719,7 +720,7 @@ namespace Nomina.Procesador.Metodos
 
                 decimal multiplodeNoventa2 = arrayF.MesesSalarioF < 0 ? 90 : arrayF.MesesSalarioF;
 
-                decimal _3_MESES_SALARIO = calcularLiquidacion == true ? Utils.TruncateDecimales((sd * tresMesesDeSalario)) : 0;
+                decimal _3_MESES_SALARIO = calcularLiquidacion == true ? Utils.TruncateDecimales((sdi * tresMesesDeSalario)) : 0;
 
                 if (custom3MesesF >= 0)
                 {
@@ -1286,7 +1287,7 @@ namespace Nomina.Procesador.Metodos
                 decimal multiplodeNoventa = arrayF.MesesSalarioF <= 0 ? 90 : arrayF.MesesSalarioF;
 
                 //double proporcion_exentaLiquidacion = (salarioMinimo * 90)* añosAntiguedad;
-                decimal proporcion_exentaLiquidacion = Utils.TruncateDecimales((salarioMinimo * multiplodeNoventa) * añosAntiguedad); //antiguedadLaboral
+                decimal proporcion_exentaLiquidacion = Utils.TruncateDecimales((salarioUMA * multiplodeNoventa) * añosAntiguedad); //antiguedadLaboral
                 //Compensacion x Indemnizacion 100% gravado
                 //##############################################################
 

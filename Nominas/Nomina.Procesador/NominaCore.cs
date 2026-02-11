@@ -1380,7 +1380,7 @@ namespace Nomina.Procesador
                 case 148://Vacaciones
                     return MPercepciones.Vacaciones(itemNomina, diasVacaciones, isPorcentajeSobreNomina, porcentajeSobreNomina);
                 case 16://Prima Vacacional
-                    return MPercepciones.PrimaVacaciones(itemNomina, totalVacaciones, uma, isPorcentajeSobreNomina, porcentajeSobreNomina);
+                    return MPercepciones.PrimaVacaciones(itemNomina, totalVacaciones, uma, isPorcentajeSobreNomina, porcentajeSobreNomina, contrato);
                 //case 158://Caja de ahorro
                 //    return MDeducciones.CajaDeAhorro(itemNomina);
                 default:

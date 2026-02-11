@@ -102,11 +102,19 @@ namespace Nomina.Procesador.Metodos
 
         }
 
-        public static NOM_Nomina_Detalle PrimaVacaciones(NOM_Nomina nomina, decimal vacaciones, decimal uma, bool isImpuestoSobreNomina = false, decimal porcentaje = 0)
+        public static NOM_Nomina_Detalle PrimaVacaciones(NOM_Nomina nomina, decimal vacaciones, decimal uma, bool isImpuestoSobreNomina = false, decimal porcentaje = 0, Empleado_Contrato contrato = null)
         {
 
-            if (vacaciones <= 0)
-                return null;
+            ////if (vacaciones <= 0)
+
+            //int añosCumplidos = nomina. - contrato.FechaReal.Year;
+
+            //// Si el aniversario no ha ocurrido aún este año, restamos 1
+            //if (hoy < contrato.FechaReal.AddYears(añosCumplidos))
+            //{
+            //    añosCumplidos--;
+            //}
+            //// return null;
 
             decimal _primaVacacional = 0;
             decimal _topePrima = 0;
